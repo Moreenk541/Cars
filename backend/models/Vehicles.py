@@ -11,8 +11,12 @@ class Vehicle(db.Model):
     Price= db.Column(db.Integer,nullable= False)
     description = db.Column(db.String(500),nullable=False)
     image_url=db.Column(db.String(255),nullable=False)
-    created_at=db.Column(db.Column,default=datetime.utcnow, nullable=False)
+    created_at=db.Column(db.datetime,default=datetime.utcnow, nullable=False)
 
-    
+    #relationships 
+    cart_items= db.relationship('CartItem',back_populates='vehicle')
+    order_items=db.relationship('OrderItem',back_populates='vehicle')
+                                
+
 
     

@@ -9,9 +9,14 @@ class User(db.Model):
     id =db.Column(db.Integer,primary_key=True) 
     username = db.Column(db.String(100),unique =True, nullable=False)
     email=db.Column(db.String(155),unique=True, nullable=False)
-    _password_hash = db.Column('passsword',db.String(255),unique=True,nullable= False)
+    _password_hash = db.Column('password',db.String(255),unique=True,nullable= False)
     is_admin =db.Column(db.Boolean,default=False,nullable=False)
     created_at=db.Column(db.datetime,default=datetime.utcnow,nullable=False)
+
+    #relationships
+    cart =db.relationship('Cart',back_populates='user',uselist=False)
+    orders = db.relationship('Order', back_populates='user')
+
 
     @property
     def password(self):
