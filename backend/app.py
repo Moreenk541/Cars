@@ -1,6 +1,6 @@
 from  flask import Flask, jsonify
 from flask_cors import CORS
-from models import db
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -8,7 +8,7 @@ db = SQLAlchemy()
 
 
 app=Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123456@localhost:5432/myapp_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://moreen2:654321@localhost:5432/carsdb'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 CORS(app)
