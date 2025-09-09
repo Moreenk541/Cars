@@ -1,4 +1,4 @@
-from app import db
+from models import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -11,7 +11,7 @@ class User(db.Model):
     email=db.Column(db.String(155),unique=True, nullable=False)
     _password_hash = db.Column('password',db.String(255),unique=True,nullable= False)
     is_admin =db.Column(db.Boolean,default=False,nullable=False)
-    created_at=db.Column(db.datetime,default=datetime.utcnow,nullable=False)
+    created_at=db.Column(db.DateTime,default=datetime.utcnow,nullable=False)
 
     #relationships
     cart =db.relationship('Cart',back_populates='user',uselist=False)
