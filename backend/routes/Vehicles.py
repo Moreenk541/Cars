@@ -2,48 +2,62 @@ from flask import request,session, jsonify,Blueprint
 from models import db
 from models.Vehicles import Vehicle
 from models.Users import User
-from models.Cart import Cart
-from models.Cart_items import CartItem
+from models.Payment import Payment
+from models.VehicleImage import VehicleImage
+from auth import admin_required
 
 
-vehicles_bp=Blueprint('Vehicles',__name__)
+vehicles_bp=Blueprint('Vehicle_bp',__name__)
 
-@vehicles_bp.route("/vehicles",methods=['GET'])
-def get_vehicles():
-    vehicles =Vehicle.query.all()
-    return jsonify([{
-        'id': v.id,
-        'image': v.image,
-        'brand':v.brand,
-        'model': v.model,
-        'year': v.year,
-        'price': v.price,
-        'category': v.category,
-        'description': v.description
-
-    }for v in vehicles])
+@vehicles_bp.route('/vehicles',methods=['POST'])
+def add_vehicle():
+    data = request.json
+    user_id= session.get('user_id')
 
 
-
-@vehicles_bp.route('/search',methods=['GET'])
-def search_vehicles():
-    query = request.args.get('q','')
-    category= request.args.get('category')
-
-    q= Vehicle.query
-    if query:
-        q=q.filter(Vehicle.model.ilike(f'%{query}%'))
-    if category:
-        q=q.filter_by(category=category)    
-
-    vehicles=q.all()
+    if not user_id:
+        return jsonify({'error':'Login required'}),401
     
-    return jsonify([{
-        'id': v.id, 
-        'brand': v.brand,
-        'model':v.model,
-        "year":v.year,
-        'price':v.price
-    }for v in vehicles])
+
+    vehicle = Vehicle(
+        user_id=user_id,
+        type=data['type'],
+        brand=data['brand'],
+        model=data["model"],
+        year=data["year"],
+        price=data["price"],
+        category=data.get("category"),
+        mileage=data.get("mileage"),
+        transmission=data["transmission"],
+        fuel_type=data["fuel_type"],
+        description=data["description"],
+        location_city=data.get("location_city"),
+        location_region=data.get("location_region"),
+        main_image_url=data.get("main_image_url"),
+        status='active' if session.get('is_admin') else 'pending'
+
+    )
+
+    db.session.add(vehicle)
+    db.session.commit()
 
 
+    return jsonify({'message':'Vehicle added successfully','id':vehicle.id}),201
+
+#upload images
+
+@vehicles_bp.route('vehicles/int:vehicle_id>/images',methods=['POST'])
+def add_images(vehicle_id):
+    data= request.json
+    images= data.get('images',[])
+
+
+    for img in images:
+        new_image =VehicleImage(vehicle_id=vehicle_id,image_url=img['url'],image_type=img.get('type','other'))
+        db.session.add(new_image)
+
+    db.session.commit()
+    return jsonify({'message':'Images uploaded successfully'}),201  
+        
+
+#admin approval        
