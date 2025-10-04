@@ -1,8 +1,9 @@
 from flask import session, request,jsonify,Blueprint
 from models import db
 from models.Users import User
-from app import limiter
+
 from functools import wraps
+from routes.extensions import limiter 
 
 auth_bp=Blueprint('auth',__name__)
 
@@ -25,7 +26,7 @@ def admin_required(f):
 #Sign up
 
 @auth_bp.route('/signUp',methods=['POST'])
-@limiter.limit("5 per 30 mimunites")
+@limiter.limit("5 per 30 minutes")
 def signUp():
     data = request.json
 
@@ -56,7 +57,7 @@ def signUp():
 @limiter.limit(' 5 per minute')
 def login():
     data = request.json
-    user = User.query.filter_by(email=data.get(['email'])).first()
+    user = User.query.filter_by(email=data.get('email')).first()
 
     if user and user.check_password(data.get('password')):
         session['user_id'] = user.id
@@ -73,7 +74,7 @@ def logout():
     return jsonify({'message':'Logged out'}),200
 
 #change password
-@auth_bp.router('/change-password',methods=['POST'])
+@auth_bp.route('/change-password',methods=['POST'])
 @limiter.limit('3 per hour')
 def change_password():
     data = request.json
@@ -82,7 +83,7 @@ def change_password():
     if not user_id:
         return jsonify({'error':'Not logged in'}),401
     
-    user = User.query.get('user_id')
+    user = User.query.get(user_id)
     if not user:
         return jsonify({'error':'User not found'}),404
     
@@ -103,7 +104,7 @@ def change_password():
 @limiter.limit('3 per hour')
 def forgot_password():
     data = request.json
-    email = data.get['email']
+    email = data.get('email')
     new_password =data.get['new_password']
 
 
@@ -112,7 +113,7 @@ def forgot_password():
     if not user:
         return jsonify({'error':'User not found'})
     
-    user.passord =new_password
+    user.password =new_password
     db.session.commit()
 
 

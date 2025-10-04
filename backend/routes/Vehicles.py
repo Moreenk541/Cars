@@ -4,11 +4,11 @@ from models.Vehicles import Vehicle
 from models.Users import User
 from models.Payment import Payment
 from models.VehicleImage import VehicleImage
-from auth import admin_required
+from routes.auth import admin_required
 from datetime import datetime
 
 
-vehicle_bp=Blueprint('Vehicle_bp',__name__)
+vehicle_bp=Blueprint('Vehicles',__name__)
 
 @vehicle_bp.route('/vehicles',methods=['POST'])
 def add_vehicle():

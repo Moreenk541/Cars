@@ -1,11 +1,14 @@
 from  flask import Flask, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
-from flask_limiter.util import ger_remote_address 
+from flask_limiter.util import get_remote_address 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from routes.auth import auth_bp
-from routes.Vehicles import vehicles_bp
+from routes.Vehicles import vehicle_bp
+from routes.Cart import cart_bp
+from routes.Order import orders_bp
+from routes.extensions import limiter
 from models import db
 
 
@@ -14,22 +17,19 @@ from models import db
 
 app=Flask(__name__)
 
-limiter = Limiter(
-    ger_remote_address,
-    app=app,
-    default_limits=['200 per day','50 per hour']
-)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://moreen2:654321@localhost:5432/carsdb'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 CORS(app)
 
 db.init_app(app)
-
+limiter.init_app(app)
 # Register the auth blueprint
 app.register_blueprint(auth_bp,url_prefix="/auth")
-app.register_blueprint(vehicles_bp,url_prefix="/vehicles")
-
+app.register_blueprint(vehicle_bp,url_prefix="/vehicles")
+app.register_blueprint(orders_bp,url_prefix="/orders")
+app.register_blueprint(cart_bp,url_prefix="/cart")
 
 with app.app_context():
     db.create_all()
